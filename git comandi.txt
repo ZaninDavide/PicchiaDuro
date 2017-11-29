@@ -1,0 +1,7 @@
+PS C:\Users\Famiglia\Documents\GameMaker\Projects\Platshapes.gmx> git add .
+PS C:\Users\Famiglia\Documents\GameMaker\Projects\Platshapes.gmx> git commit -m "fake sprite"
+[master d3787e6] fake sprite
+ 3 files changed, 25 insertions(+)
+ create mode 100644 sprites/images/sprite16_0.png
+ create mode 100644 sprites/sprite16.sprite.gmx
+PS C:\Users\Famiglia\Documents\GameMaker\Projects\Platshapes.gmx> git push

@@ -26,7 +26,6 @@
       <sprite>sprites\spr_grass</sprite>
       <sprite>sprites\spr_pedana</sprite>
     </sprites>
-    <sprite>sprites\sprite16</sprite>
   </sprites>
   <backgrounds name="background"/>
   <paths name="paths"/>
