@@ -1,0 +1,307 @@
+//Variabili:
+//Keys:
+mouse_left = mouse_check_button_pressed(mb_left);
+mouse_right = mouse_check_button_pressed(mb_right);
+
+left = ((keyboard_check(vk_left) || keyboard_check(ord("A"))) and input_control = 0) || (gamepad_axis_value(0, gp_axislh) < -0.1 and input_control = 1);
+right = ((keyboard_check(vk_right) || keyboard_check(ord("D"))) and input_control = 0) || (gamepad_axis_value(0, gp_axislh) > 0.1 and input_control = 1);
+up = ((keyboard_check(vk_up) || keyboard_check(ord("W"))) and input_control = 0) || (gamepad_button_check(0, gp_face1) and input_control = 1);
+down = ((keyboard_check(vk_down) || keyboard_check(ord("S"))) and input_control = 0);
+
+
+left_last_pressed = ((keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))) and input_control = 0) || (gamepad_axis_value(0, gp_axislh) < -0.1 and input_control = 1);
+right_last_pressed = ((keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))) and input_control = 0) || (gamepad_axis_value(0, gp_axislh) > 0.1 and input_control = 1);
+
+up_pressed = ((keyboard_check_pressed(vk_up) || keyboard_check_pressed(ord("W"))) and input_control = 0) || (gamepad_button_check_pressed(0, gp_face1) and input_control = 1);
+up_released = ((keyboard_check_released(vk_up) || keyboard_check_released(ord("W"))) and input_control = 0) || gamepad_button_check_released(0, gp_face1)
+
+space = (keyboard_check(vk_space) and input_control = 0);
+shift_pressed = (keyboard_check_pressed(vk_shift) and input_control = 0) || (gamepad_button_check_pressed(0, gp_shoulderl) and input_control = 1);
+shift_released = (keyboard_check_released(vk_shift) and input_control = 0) || (gamepad_button_check_released(0, gp_shoulderl) and input_control = 1);
+ctrl = (keyboard_check(vk_control) and input_control = 0) || (gamepad_button_check(0, gp_shoulderr) and input_control = 1);
+ctrl_pressed = (keyboard_check_pressed(vk_control) and input_control = 0) || (gamepad_button_check_pressed(0, gp_shoulderr) and input_control = 1);
+
+press_x = (keyboard_check_pressed(ord("X")) and input_control = 0) || (gamepad_button_check_pressed(0, gp_shoulderlb) and input_control = 1);
+press_c = (keyboard_check_pressed(ord("C")) and input_control = 0) || (gamepad_button_check_pressed(0, gp_shoulderrb) and input_control = 1);
+
+press_z = (keyboard_check_pressed((ord("Z"))) and input_control = 0) || (gamepad_button_check_pressed(0, gp_face3) and input_control = 1)
+
+collision_left_at_start = place_meeting(x - 1, y, obj_collision_pg);
+collision_right_at_start = place_meeting(x + 1, y, obj_collision_pg);
+
+if(left_last_pressed || press_x){
+    last_pressed = -1;
+}else if(right_last_pressed || press_c){
+    last_pressed = 1;
+}
+
+//sword_h
+if(press_z and able_sword_h){
+    if(last_pressed = -1){
+        new_mask_left = instance_create(x, y, obj_sword_left_mask);
+        new_mask_left.team = team;
+        new_mask_left.able = true;
+        new_mask_left.damage = sword_h_damage;
+        able_sword_h = false;
+        alarm[1] = sword_h_time;
+    }else if(last_pressed = 1){
+        new_mask_right = instance_create(x, y, obj_sword_right_mask);
+        new_mask_right.team = team;
+        new_mask_right.able = true;
+        new_mask_right.damage = sword_h_damage;
+        able_sword_h = false;
+        alarm[1] = sword_h_time;
+    }
+}
+
+// rotolata
+if(press_c and !collision_right_at_start and in_rotolata = 0 and able_rotolata and can_rotolata){
+    in_rotolata = 1
+    if(in_shift){
+        move_speed -= shift_acceleration;
+        in_shift = false;
+    }
+    move_speed = original_move_speed + in_rotolata_acceleration;
+    my_hspeed = move_speed;
+    my_vspeed = 0;
+    alarm[0] = in_rotolata_wait_time;
+}else if(press_x and !collision_left_at_start and in_rotolata = 0 and able_rotolata and can_rotolata){
+    in_rotolata = -1
+    if(in_shift){
+        move_speed -= shift_acceleration;
+        in_shift = false;
+    }
+    move_speed = original_move_speed + in_rotolata_acceleration;
+    my_hspeed = -move_speed;
+    my_vspeed = 0;
+    alarm[0] = in_rotolata_wait_time;
+}
+
+if(in_rotolata != 0){
+    able_grav = false;
+    able_move_left = false;
+    able_move_right = false;
+    able_move_up = false;
+    able_move_down = false;
+    able_ctrl = false;
+    able_shift = false;
+    able_sword_h = false;
+    have_to_wall_jump = 0;
+}else{
+    able_grav = true;
+    able_move_left = true;
+    able_move_right = true;
+    able_move_up = true;
+    able_move_down = can_move_down;
+    able_ctrl = can_ctrl;
+    able_shift = can_shift;
+    able_sword_h = can_sword_h;
+}
+
+
+// LEFT MOVEMENT
+
+if(shift_pressed and able_shift = true and in_shift = false and !in_rotolata){
+    move_speed += shift_acceleration;
+    in_shift = true;
+}else if(shift_released and in_shift and !in_rotolata){
+    move_speed -= shift_acceleration;
+    in_shift = false;
+}
+
+
+
+
+if(have_to_walljump = 1){
+    my_hspeed = move_speed*1.5;
+}else if(have_to_walljump = -1){
+    my_hspeed = -move_speed*1.5;
+}else if(left and able_move_left and !in_rotolata and !right and my_hspeed > -move_speed){
+    my_hspeed -= acceleration;
+}else if(right and able_move_right and !in_rotolata and !left and my_hspeed < move_speed){
+    my_hspeed += acceleration;
+}
+
+if(have_to_walljump = 0){
+    if((!right and !left) or in_rotolata != 0 or (right and left) and my_hspeed != 0){
+        before_sign = sign(my_hspeed);
+        my_hspeed += acceleration * -sign(my_hspeed);
+        if((before_sign = 1 and my_hspeed < 0) || before_sign = -1 and my_hspeed > 0){my_hspeed = 0;}
+        if(my_hspeed > move_speed){my_hspeed = move_speed}
+        if(my_hspeed < -move_speed){my_hspeed = -move_speed}
+    }
+}
+if(my_hspeed > move_speed){my_hspeed -= min(acceleration / 3, abs(my_hspeed - move_speed))}
+if(my_hspeed < -move_speed){my_hspeed += min(acceleration / 3, abs(my_hspeed - move_speed))}
+have_to_walljump = 0;
+
+if(my_hspeed < 0){
+    if(place_meeting(x + my_hspeed, y, obj_collision_pg)){
+        nudge = my_hspeed + 1;
+        while(place_meeting(x + nudge, y, obj_collision_pg) and nudge < 0){
+            nudge += 1;
+        }
+        my_hspeed = nudge;
+    }
+}else if(my_hspeed > 0){
+    if(place_meeting(x + my_hspeed, y, obj_collision_pg)){
+        nudge = my_hspeed - 1;
+        while(place_meeting(x + nudge, y, obj_collision_pg) and nudge > 0){
+            nudge -= 1;
+        }
+        my_hspeed = nudge;
+    }
+}
+
+my_moving_block_speed = 0;
+moving_block_under = place_meeting(x, y + 1, obj_moving_block);
+if(moving_block_under){
+     my_moving_block_speed = instance_place(x, y + 1, obj_moving_block).movingo_hspeed;
+}
+moving_block_left = place_meeting(x - 1, y, obj_moving_block);
+if(moving_block_left){
+    my_moving_block_speed = instance_place(x - 1, y, obj_moving_block).movingo_hspeed;
+}
+moving_block_right = place_meeting(x + 1, y, obj_moving_block);
+if(moving_block_right){
+    my_moving_block_speed = instance_place(x + 1, y, obj_moving_block).movingo_hspeed;
+}
+
+if(my_moving_block_speed + my_hspeed < 0){
+    if(place_meeting(x + my_hspeed + my_moving_block_speed, y, obj_collision_pg)){
+        nudge = my_hspeed + my_moving_block_speed + 1;
+        while(place_meeting(x + nudge, y, obj_collision_pg) and nudge < 0){
+            nudge += 1;
+        }
+        my_moving_block_speed = nudge - my_hspeed;
+    }
+}else if(my_moving_block_speed + my_hspeed > 0){
+    if(place_meeting(x + my_hspeed + my_moving_block_speed, y, obj_collision_pg)){
+        nudge = my_hspeed + my_moving_block_speed - 1;
+        while(place_meeting(x + nudge, y, obj_collision_pg) and nudge > 0){
+            nudge -= 1;
+        }
+        my_moving_block_speed = nudge - my_hspeed;
+    }
+}
+x += my_moving_block_speed;
+/*
+if(place_meeting(x - 1, y, obj_moving_block)){
+    m_object_left = instance_place(x - 1 + my_hspeed, y, obj_moving_block);
+    m_object_down = instance_place(x, y + 1, obj_collision_pg);
+    m_object_wall_right = instance_place(x + 1 + my_hspeed + m_object_left.movingo_hspeed, y, obj_collision_pg);
+    if(m_object_wall_right != m_object_left and  m_object_left.movingo_hspeed > 0 and place_meeting(x + 1 + my_hspeed + m_object_left.movingo_hspeed, y, obj_collision_pg)){
+        show_message("Dead")
+        room_restart();
+    }
+}
+if(place_meeting(x + 1, y, obj_moving_block)){
+    m_object_right = instance_place(x + 1 + my_hspeed, y, obj_moving_block);
+    m_object_down = instance_place(x, y + 1, obj_collision_pg);
+    m_object_wall_left = instance_place(x - 1 + my_hspeed + m_object_right.movingo_hspeed, y, obj_collision_pg);
+    if(m_object_wall_left != m_object_right and m_object_right.movingo_hspeed < 0 and place_meeting(x - 1 + my_hspeed + m_object_right.movingo_hspeed, y, obj_collision_pg)){
+        show_message("Dead")
+        room_restart();
+    }
+}
+// gestione pedane
+if(place_meeting(x, y + 1, obj_moving_block)){
+    m_object = instance_place(x, y + 1, obj_moving_block);
+    my_movingo_hspeed = m_object.movingo_hspeed;
+    if(my_movingo_hspeed < 0){
+        if(place_meeting(x + my_movingo_hspeed, y, obj_collision_pg)){
+            nudge = my_movingo_hspeed + 1;
+            while(place_meeting(x + nudge, y, obj_collision_pg) and nudge <= 0){
+                nudge += 1;
+            }
+           my_movingo_hspeed = nudge;
+        }
+    }else if(my_movingo_hspeed > 0){
+        if(place_meeting(x + my_movingo_hspeed, y, obj_collision_pg)){
+            nudge = my_movingo_hspeed - 1;
+            while(place_meeting(x + nudge, y, obj_collision_pg) and nudge >= 0){
+                nudge -= 1;
+            }
+            my_movingo_hspeed = nudge;
+        }
+    }
+    x += my_movingo_hspeed;
+    //if(place_meeting(x + 1, y, m_object) and m_object.movingo_hspeed < 0 and my_hspeed > m_object.movingo_hspeed){
+     //   my_hspeed = m_object.movingo_hspeed;
+    //}else if(place_meeting(x - 1, y, m_object) and m_object.movingo_hspeed > 0 and my_hspeed < m_object.movingo_hspeed){
+    //    my_hspeed = m_object.movingo_hspeed;
+    //}else{
+    //    my_hspeed += m_object.movingo_hspeed;
+    //}
+}
+
+if(place_meeting(x + 1, y, obj_moving_block) and place_meeting(x + 1, y, obj_moving_block).hspeed < 0 and my_hspeed > 0){
+    my_hspeed = 0;
+}
+if(place_meeting(x - 1, y, obj_moving_block) and place_meeting(x + 1, y, obj_moving_block).hspeed > 0 and my_hspeed < 0){
+    my_hspeed = 0;
+}*/
+
+x += my_hspeed;
+
+// VERTICAL MOVEMENT
+/*if(able_ctrl and ctrl_pressed and (place_meeting(x - 1, y, obj_collision_pg) or place_meeting(x + 1, y, obj_collision_pg))){
+    my_vspeed = 0;
+}*/
+if(able_grav){ //and !(able_ctrl and ctrl and (place_meeting(x - 1, y, obj_collision_pg) or place_meeting(x + 1, y, obj_collision_pg)))){
+    my_vspeed += grav;
+}
+if(place_meeting(x, y + 1, obj_collision_pg)){
+    double_jump = 0;
+}
+if(able_move_up){
+    if(double_jump = 0 and place_meeting(x, y + 1, obj_collision_pg) and up){
+        my_vspeed = -jump_speed;
+        double_jump += 1;
+    }else if(collision_left_at_start and able_wall_jump and up and !left){ //wall_jump_right   
+        my_vspeed = -jump_speed;
+        have_to_walljump = 1;
+    }else if(collision_right_at_start and able_wall_jump and up and !right){ //wall_jump_left   
+        my_vspeed = -jump_speed;
+        have_to_walljump = -1;
+    }else if((double_jump > 0 or !place_meeting(x, y + 1, obj_collision_pg)) and double_jump < max_double_jump and up_pressed and able_double_jump){
+        my_vspeed = -jump_speed;
+        double_jump += 1;
+        if(double_jump = 1){double_jump = 2;}
+    }
+}
+if(able_ctrl and ctrl and (place_meeting(x - 1, y, obj_collision_pg) or place_meeting(x + 1, y, obj_collision_pg))){
+    my_vspeed = 0;
+}
+
+if(my_vspeed < 0 and place_meeting(x, y + my_vspeed, obj_collision_pg)){
+        nudge = my_vspeed + 1;
+        while(place_meeting(x, y + nudge, obj_collision_pg) and nudge < 0){
+            nudge += 1;
+        }
+        my_vspeed = nudge;
+}else if(my_vspeed > 0 and place_meeting(x, y + my_vspeed, obj_collision_pg)){
+        nudge = my_vspeed - 1;
+        while(place_meeting(x, y + nudge, obj_collision_pg) and nudge > 0){
+            nudge -= 1;
+        }
+        my_vspeed = nudge;
+}
+y += my_vspeed;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -6,6 +6,11 @@
   <NewExtensions/>
   <sounds name="sound"/>
   <sprites name="sprites">
+    <sprites name="objects">
+      <sprite>sprites\spr_grass</sprite>
+      <sprite>sprites\spr_pedana</sprite>
+      <sprite>sprites\spr_pedana_invert</sprite>
+    </sprites>
     <sprites name="pg">
       <sprite>sprites\spr_pg_des_m</sprite>
       <sprite>sprites\spr_pg_des_f</sprite>
@@ -22,20 +27,30 @@
       <sprite>sprites\spr_pg_giu_sword</sprite>
       <sprite>sprites\spr_pg_su_scala</sprite>
     </sprites>
-    <sprites name="objects">
-      <sprite>sprites\spr_grass</sprite>
-      <sprite>sprites\spr_pedana</sprite>
+    <sprites name="masks">
+      <sprite>sprites\spr_sword_left_mask</sprite>
+      <sprite>sprites\spr_sword_right_mask</sprite>
     </sprites>
   </sprites>
   <backgrounds name="background"/>
   <paths name="paths"/>
   <objects name="objects">
-    <object>objects\obj_collision_pg</object>
-    <object>objects\obj_moving_block</object>
     <object>objects\obj_pg</object>
-    <object>objects\obj_grass</object>
-    <object>objects\obj_pedana</object>
-    <object>objects\obj_pedana_sin</object>
+    <objects name="parents">
+      <object>objects\obj_collision_pg</object>
+      <object>objects\obj_moving_block</object>
+    </objects>
+    <objects name="blocks">
+      <object>objects\obj_grass</object>
+    </objects>
+    <objects name="moving_blocks">
+      <object>objects\obj_pedana</object>
+      <object>objects\obj_pedana_invert</object>
+    </objects>
+    <objects name="masks">
+      <object>objects\obj_sword_left_mask</object>
+      <object>objects\obj_sword_right_mask</object>
+    </objects>
   </objects>
   <rooms name="rooms">
     <room>rooms\room1</room>
